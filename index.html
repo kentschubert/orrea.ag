@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<!--version 1.1-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orrea.ag | Connected Intelligence for Ag Retail Teams</title>
+
+  <meta
+    name="description"
+    content="Orrea brings enterprise data, relationship knowledge, market signals, and crop intelligence into one coherent view for ag retail teams."
+  />
+
+  <link rel="icon" type="image/svg+xml" href="orrea_mark.svg" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root {
+      --text-primary: #f7f1df;
+      --text-secondary: rgba(247, 241, 223, 0.74);
+      --text-muted: rgba(247, 241, 223, 0.52);
+      --gold: #e8c36a;
+      --gold-soft: rgba(232, 195, 106, 0.44);
+      --sage: #9fad8a;
+      --dark: #07100f;
+      --panel: rgba(5, 12, 11, 0.42);
+      --panel-border: rgba(247, 241, 223, 0.12);
+
+      /* Type system: Jost carries the brand voice, Inter carries the reading. */
+      --font-display: "Jost", ui-sans-serif, system-ui, sans-serif;
+      --font-body: "Inter", ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      font-family: var(--font-body);
+      background: var(--dark);
+      color: var(--text-primary);
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 50% 68%, rgba(232, 195, 106, 0.12), transparent 28%),
+        radial-gradient(circle at 50% 105%, rgba(232, 195, 106, 0.34), transparent 32%),
+        linear-gradient(180deg, #05080b 0%, #07100f 38%, #10201b 68%, #1c241a 100%);
+    }
+
+    /*
+      Atmospheric field background:
+      - dawn breakthrough
+      - faint GIS / crop-row grid
+      - mist
+      - subtle signal nodes
+    */
+
+    .background {
+      position: absolute;
+      inset: 0;
+      z-index: -3;
+      overflow: hidden;
+    }
+
+    .horizon-glow {
+      position: absolute;
+      left: 50%;
+      bottom: 14%;
+      width: 88vw;
+      height: 42vh;
+      transform: translateX(-50%);
+      background:
+        radial-gradient(
+          ellipse at center,
+          rgba(244, 211, 128, 0.42) 0%,
+          rgba(244, 211, 128, 0.2) 26%,
+          rgba(159, 173, 138, 0.08) 48%,
+          transparent 72%
+        );
+      filter: blur(18px);
+      opacity: 0.9;
+    }
+
+    .light-column {
+      position: absolute;
+      left: 50%;
+      bottom: 18%;
+      width: 34vw;
+      height: 78vh;
+      transform: translateX(-50%);
+      background:
+        linear-gradient(
+          180deg,
+          transparent 0%,
+          rgba(244, 211, 128, 0.05) 24%,
+          rgba(244, 211, 128, 0.16) 54%,
+          rgba(244, 211, 128, 0.28) 100%
+        );
+      clip-path: polygon(42% 0%, 58% 0%, 100% 100%, 0% 100%);
+      filter: blur(14px);
+      opacity: 0.72;
+    }
+
+    .field-plane {
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      bottom: -18%;
+      height: 58%;
+      transform: perspective(900px) rotateX(62deg);
+      transform-origin: bottom center;
+      background:
+        linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(247, 241, 223, 0.065) 1px,
+          transparent 2px
+        ),
+        linear-gradient(
+          0deg,
+          transparent 0%,
+          rgba(247, 241, 223, 0.05) 1px,
+          transparent 2px
+        ),
+        repeating-linear-gradient(
+          82deg,
+          rgba(159, 173, 138, 0.04) 0px,
+          rgba(159, 173, 138, 0.04) 1px,
+          transparent 1px,
+          transparent 28px
+        ),
+        linear-gradient(
+          180deg,
+          rgba(26, 44, 35, 0.05),
+          rgba(10, 20, 16, 0.76)
+        );
+      background-size:
+        92px 92px,
+        92px 92px,
+        auto,
+        auto;
+      mask-image: linear-gradient(to top, black 58%, transparent 100%);
+      opacity: 0.68;
+    }
+
+    .field-contours {
+      position: absolute;
+      inset: auto -10% -20% -10%;
+      height: 62%;
+      transform: perspective(900px) rotateX(62deg);
+      transform-origin: bottom center;
+      background:
+        repeating-radial-gradient(
+          ellipse at 50% 42%,
+          transparent 0px,
+          transparent 46px,
+          rgba(232, 195, 106, 0.07) 47px,
+          transparent 49px
+        );
+      mask-image: linear-gradient(to top, black 48%, transparent 92%);
+      opacity: 0.34;
+      filter: blur(0.2px);
+    }
+
+    .mist {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 62%, rgba(255, 255, 255, 0.11), transparent 24%),
+        radial-gradient(circle at 70% 58%, rgba(255, 255, 255, 0.08), transparent 26%),
+        linear-gradient(
+          180deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.035) 47%,
+          rgba(255, 255, 255, 0.09) 70%,
+          transparent 100%
+        );
+      filter: blur(12px);
+      opacity: 0.62;
+    }
+
+    .nodes {
+      position: absolute;
+      left: 50%;
+      bottom: 16%;
+      width: min(760px, 90vw);
+      height: 330px;
+      transform: translateX(-50%);
+      opacity: 0.88;
+    }
+
+    .nodes svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .signal-line {
+      stroke: rgba(232, 195, 106, 0.34);
+      stroke-width: 1;
+      fill: none;
+      filter: drop-shadow(0 0 8px rgba(232, 195, 106, 0.34));
+    }
+
+    .signal-line.soft {
+      stroke: rgba(159, 173, 138, 0.22);
+    }
+
+    .node {
+      fill: rgba(247, 241, 223, 0.92);
+      filter: drop-shadow(0 0 10px rgba(232, 195, 106, 0.75));
+    }
+
+    .node.dim {
+      fill: rgba(159, 173, 138, 0.72);
+      filter: drop-shadow(0 0 8px rgba(159, 173, 138, 0.48));
+    }
+
+    .grain {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.08;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px);
+      background-size: 3px 3px;
+      mix-blend-mode: soft-light;
+    }
+
+    .vignette {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background:
+        radial-gradient(circle at center, transparent 0%, transparent 42%, rgba(0, 0, 0, 0.52) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.34), transparent 42%, rgba(0,0,0,0.28));
+    }
+
+    .content {
+      width: min(960px, 100%);
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      max-width: 760px;
+      padding: 34px 34px 32px;
+      border: 1px solid var(--panel-border);
+      background:
+        linear-gradient(
+          135deg,
+          rgba(5, 12, 11, 0.58),
+          rgba(5, 12, 11, 0.26)
+        );
+      backdrop-filter: blur(18px);
+      box-shadow:
+        0 28px 90px rgba(0, 0, 0, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      border-radius: 28px;
+    }
+
+    /* Brand mark — the orrery, inlined and tinted to the page palette */
+    .brandmark {
+      display: block;
+      width: clamp(60px, 8vw, 78px);
+      height: auto;
+      margin: 0 0 26px;
+      color: var(--text-primary);
+      filter: drop-shadow(0 0 18px rgba(232, 195, 106, 0.28));
+    }
+
+    .brandmark .ink {
+      stroke: currentColor;
+      fill: none;
+    }
+
+    .brandmark .ink-fill {
+      fill: currentColor;
+      stroke: none;
+    }
+
+    .brandmark .accent {
+      fill: var(--gold);
+      stroke: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      color: var(--text-secondary);
+      font-family: var(--font-display);
+      font-size: 0.78rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 38px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      box-shadow: 0 0 12px var(--gold-soft);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: clamp(3.4rem, 9.6vw, 6.6rem);
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      font-weight: 600;
+    }
+
+    .mark {
+      color: var(--text-primary);
+      text-shadow:
+        0 0 34px rgba(232, 195, 106, 0.22),
+        0 0 90px rgba(232, 195, 106, 0.18);
+    }
+
+    .mark .tld {
+      color: var(--gold);
+      font-weight: 400;
+    }
+
+    .tagline {
+      margin: 28px 0 0;
+      max-width: 660px;
+      font-family: var(--font-display);
+      font-size: clamp(1.35rem, 3.2vw, 2.3rem);
+      line-height: 1.12;
+      letter-spacing: -0.02em;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .description {
+      margin: 24px 0 0;
+      max-width: 650px;
+      color: var(--text-secondary);
+      font-size: clamp(1rem, 1.45vw, 1.16rem);
+      line-height: 1.7;
+    }
+
+    .description strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .signals {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 30px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(247, 241, 223, 0.12);
+      background: rgba(247, 241, 223, 0.055);
+      color: rgba(247, 241, 223, 0.78);
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-size: 0.82rem;
+      letter-spacing: 0.02em;
+    }
+
+    .footer-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 18px;
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(247, 241, 223, 0.1);
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .footer-row a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(232, 195, 106, 0.28);
+    }
+
+    .footer-row a:hover {
+      color: var(--text-primary);
+      border-bottom-color: rgba(232, 195, 106, 0.8);
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        align-items: flex-end;
+        padding: 24px 16px;
+      }
+
+      .hero {
+        padding: 28px 22px 24px;
+        border-radius: 22px;
+      }
+
+      .brandmark {
+        margin-bottom: 20px;
+      }
+
+      .eyebrow {
+        margin-bottom: 22px;
+      }
+
+      .signals {
+        gap: 8px;
+      }
+
+      .pill {
+        font-size: 0.78rem;
+        padding: 8px 11px;
+      }
+
+      .nodes {
+        bottom: 31%;
+        opacity: 0.58;
+      }
+
+      .field-plane,
+      .field-contours {
+        height: 48%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <div class="background" aria-hidden="true">
+      <div class="horizon-glow"></div>
+      <div class="light-column"></div>
+      <div class="field-plane"></div>
+      <div class="field-contours"></div>
+
+      <div class="nodes">
+        <svg viewBox="0 0 760 330" role="img" aria-label="">
+          <path class="signal-line soft" d="M92 242 C168 182, 238 194, 312 126 S475 66, 650 102" />
+          <path class="signal-line" d="M118 260 C208 206, 268 214, 354 162 S492 122, 674 150" />
+          <path class="signal-line soft" d="M176 278 C260 250, 332 230, 412 196 S540 162, 700 216" />
+          <path class="signal-line" d="M214 208 C294 166, 348 145, 424 104 S552 58, 640 76" />
+          <path class="signal-line soft" d="M72 198 C190 154, 292 126, 392 142 S572 198, 704 178" />
+
+          <circle class="node" cx="92" cy="242" r="3.2" />
+          <circle class="node dim" cx="118" cy="260" r="2.6" />
+          <circle class="node" cx="176" cy="278" r="2.8" />
+          <circle class="node" cx="214" cy="208" r="3.3" />
+          <circle class="node dim" cx="312" cy="126" r="2.6" />
+          <circle class="node" cx="354" cy="162" r="3.8" />
+          <circle class="node dim" cx="412" cy="196" r="2.7" />
+          <circle class="node" cx="424" cy="104" r="3.4" />
+          <circle class="node dim" cx="552" cy="58" r="2.5" />
+          <circle class="node" cx="640" cy="76" r="3.6" />
+          <circle class="node dim" cx="650" cy="102" r="2.8" />
+          <circle class="node" cx="674" cy="150" r="3.1" />
+          <circle class="node dim" cx="700" cy="216" r="2.5" />
+          <circle class="node" cx="704" cy="178" r="3.2" />
+        </svg>
+      </div>
+
+      <div class="mist"></div>
+      <div class="grain"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <section class="content">
+      <div class="hero">
+        <svg class="brandmark" viewBox="-7.3 -7.3 174.6 174.6" role="img" aria-label="Orrea mark">
+          <line class="ink" x1="80" y1="80" x2="132.02" y2="33.16" stroke-width="0.8" stroke-opacity="0.4" />
+          <line class="ink" x1="80" y1="80" x2="50.45" y2="117.82" stroke-width="0.8" stroke-opacity="0.4" />
+          <line class="ink" x1="80" y1="80" x2="96.71" y2="99.92" stroke-width="0.8" stroke-opacity="0.4" />
+          <circle class="ink" cx="80" cy="80" r="26" stroke-width="1.0" stroke-opacity="0.75" />
+          <circle class="ink" cx="80" cy="80" r="48" stroke-width="1.0" stroke-opacity="0.75" />
+          <circle class="ink" cx="80" cy="80" r="70" stroke-width="1.3" stroke-opacity="0.9" />
+          <circle class="accent" cx="80" cy="80" r="8" />
+          <circle class="accent" cx="132.02" cy="33.16" r="6.0" />
+          <circle class="ink-fill" cx="50.45" cy="117.82" r="5.0" />
+          <circle class="ink-fill" cx="96.71" cy="99.92" r="4.0" />
+        </svg>
+
+        <div class="eyebrow">Be Here Now</div>
+
+        <h1 class="mark">Orrea<span class="tld">.ag</span></h1>
+
+        <p class="tagline">
+          one coherent view
+        </p>
+
+        <p class="description">
+          See the whole customer. Act as one team. Orrea.ag brings
+          <strong>enterprise data</strong>, <strong>relationship knowledge</strong>,
+          <strong>market signals</strong>, and <strong>crop intelligence</strong>
+          into one coherent view &mdash; helping ag retail teams turn siloed knowledge
+          and disconnected data into shared intelligence.
+        </p>
+
+        <div class="signals" aria-label="Product themes">
+          <span class="pill">coherence</span>
+          <span class="pill">customer intelligence</span>
+          <span class="pill">field context</span>
+          <span class="pill">trusted advisor</span>
+          <span class="pill">timely action</span>
+        </div>
+
+        <div class="footer-row">
+          <span>Connected intelligence for ag retail teams.</span>
+          <span><a href="mailto:answers@orrea.ag">answers@orrea.ag</a></span>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
